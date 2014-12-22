@@ -3,15 +3,16 @@
 import os
 import sys
 import shutil
+import argparse
 
 # Recursively cd up until either _config.yml is found or we reach /
 def getWebsiteRoot():
 	path = str(os.getcwd())
-	while path != '/':
-		if os.path.isfile('./_config.yml') and not os.path.islink('./_config.yml'):
+	while path != "/":
+		if os.path.isfile("./_config.yml") and not os.path.islink("./_config.yml"):
 			return path
 		else:
-			os.chdir('..')
+			os.chdir("..")
 			path = str(os.getcwd())
 	raise Exception()
 
@@ -20,25 +21,32 @@ def getWebsiteRoot():
 if __name__ == "__main__":
 
 	# first off, check if cwd is in a jekyll directory
+	'''
 	try:
 		siteRoot = getWebsiteRoot()
 	except:
-		print('[draught] Error: this is not a Jekyll website')
+		print("[draught] Error: this is not a Jekyll website")
 		sys.exit()
-	
-	# Define and parse arguments
+	'''
+	# Top-level parser
 	parser = argparse.ArgumentParser()
-	#parser.add_argument('mode', choices=['clear', 'c', 'backup', 'b', 'add', 'a'], help='define what mode to execute in')
-	#parser.add_argument('files', nargs='*', help='when using cfgbk add, one or more files should be provided')
+	
+	subparsers = parser.add_subparsers(help="something")
+	
+	# new command parser
+	parser_new = subparsers.add_parser("new", help="new help")
+	parser_new.add_argument("type", help="post or draft")
+	parser_new.add_argument("title", nargs=1)
+	
+	# publish command parser
+	parser_publish = subparsers.add_parser("publish", help="publish help")
+	parser_publish.add_argument("target", help="draft to publish")
+	
+	try:	
+		args = parser.parse_args()
+		print("parsing done")
+		print(str(args))
+	except:
+		print("do it properly yo")
+	
 
-	args = parser.parse_args()
-	
-	
-	# Act depending on mode selected	
-	if args.mode == 'backup' or args.mode == 'b':
-		#
-	elif args.mode == 'clear' or args.mode == 'c':
-		#
-	elif args.mode == 'add' or args.mode == 'a':
-		#
-	
