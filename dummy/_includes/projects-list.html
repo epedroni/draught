@@ -1,0 +1,17 @@
+<h1>Projects</h1>
+<strong>Ongoing</strong>
+<ul>
+    {% for project in site.projects %}
+        {% if project.ongoing %}
+            <li><a href="{{ site.baseurl }}{{ project.url }}">{{ project.title }}</a></li>
+        {% endif %}
+    {% endfor %}
+</ul>
+<strong>Completed</strong>
+<ul>
+    {% for project in site.projects %}
+        {% if project.ongoing == false %}
+            <li><a href="{{ site.baseurl }}{{ project.url }}">{{ project.title }}</a></li>
+        {% endif %}
+    {% endfor %}
+</ul>

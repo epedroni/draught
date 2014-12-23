@@ -1,0 +1,116 @@
+@import url(http://fonts.googleapis.com/css?family=Lato:400,700);
+*{font-family: 'Lato', sans-serif;}
+
+body {
+    padding-top: 60px;
+    padding-bottom: 60px;
+}
+
+blockquote {
+    font-size:1.4rem;
+}
+
+hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+code {
+    color: #2568C7;
+    background-color: #F2F2F9;
+}
+
+.copyright {
+    color: #ffffff;
+    font-size: 1.2rem;
+}
+
+.footer {
+    text-align: center;
+    padding-top: 1px;
+    margin-bottom: -8px;
+}
+
+.footer a {
+    color: #92b5d4;
+}
+
+.sidebar li {
+    margin-top: 1rem;
+    line-height: 1.4rem;
+}
+
+.container-left {
+    margin: 0;
+}
+
+.well h1 {
+    color: #404040;
+    font-size: 1.9rem;
+    margin-top: 0px;
+}
+
+.title {
+    color: #303030;
+    font-size: 2rem;
+}
+
+.well h2 {
+    color: #404040;
+    font-size: 1.6rem;
+    margin-top: 0px;
+    font-weight: bold;
+}
+
+.well a {
+    color: #2869a1;
+}
+
+.well a:hover {
+    color: #428bca;
+}
+
+.author {
+    color: #ee4444;
+}
+
+.author a {
+    color: #ee4444;
+}
+
+.rightbullet {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.sub-header {
+  margin-bottom: 0px;
+  font-weight: bold;
+}
+
+.copyright-caption {
+  font-size: 1.2rem;
+  font-style: italic;
+  color: #555;
+  text-align: right;
+  width: -moz-max-content;
+  width: -webkit-max-content;
+  width: intrinsic;
+  width: max-content;
+}
+
+pre {
+    overflow-x: auto;
+}
+pre code {
+    overflow-wrap: normal;
+    white-space: pre;
+}
+
+a:not([href^="/"]):after {
+    content: '⤴';
+}
+
+a:not([href^="/"]) {
+    target: "_blank";
+}

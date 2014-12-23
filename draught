@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
 
+'''
+TODO:
+	- sort out dates for new post
+	- replace everything but alphanumeric with '-' (slugify)
+	- 
+'''
 import os
 import sys
 import shutil
-import argparse
+import re
+
+class ParseException(Exception):
+	pass
 
 # Recursively cd up until either _config.yml is found or we reach /
 def getWebsiteRoot():
@@ -15,38 +24,72 @@ def getWebsiteRoot():
 			os.chdir("..")
 			path = str(os.getcwd())
 	raise Exception()
+	
+def ask(question):
+	print(question, end=" ")
+	return input()
 
+def slugify(string):
+	newString = string.lower()
+	return re.sub("[^(a-z|0-9)]+", '-', newString)
+
+def showDraughtHelp():
+	print("usage: draught <command> [<args>]\n")
+	print("Available commands:")
+	print("\tnew\tcreate new content")
+	print("\tpublish\tmake drafts available\n")
+	print("See 'draught help <command>' for information about commands.")
+
+def createNewPost(title):
+	if not os.path.exists(os.path.join(siteRoot, "_posts")):
+		create = ask("_posts has not been found, would you like to create it? (Y/n)")
+		if create == "y" or create == "yes" or create == "":
+			os.mkdir(os.path.join(siteRoot, "_posts"))
+		else:
+			print("can't create a post if _posts doesn't exist, abort!")
+			return
+	postPath = os.path.join(siteRoot, "_posts", slugify(title) + ".md")
+	if not os.path.exists(postPath):
+		open(postPath, 'a').close()
+	else:
+		print("post already exists, abort!")
+	
+def createNewDraft(title):
+	if not os.path.exists(os.path.join(siteRoot, "_drafts")):
+		create = ask("_drafts has not been found, would you like to create it? (Y/n)")
+		if create == "y" or create == "yes" or create == "":
+			os.mkdir(os.path.join(siteRoot, "_drafts"))
+		else:
+			print("can't create a draft if _drafts doesn't exist, abort!")
+			return
+	draftPath = os.path.join(siteRoot, "_drafts", slugify(title) + ".md")
+	if not os.path.exists(draftPath):
+		open(draftPath, 'a').close()
+	else:
+		print("draft already exists, abort!")
 
 # The entry point
 if __name__ == "__main__":
 
 	# first off, check if cwd is in a jekyll directory
-	'''
 	try:
 		siteRoot = getWebsiteRoot()
 	except:
 		print("[draught] Error: this is not a Jekyll website")
 		sys.exit()
-	'''
-	# Top-level parser
-	parser = argparse.ArgumentParser()
+	try:
+		if sys.argv[1] == "new":
+			if sys.argv[2] == "post":
+				createNewPost(sys.argv[3])
+			elif sys.argv[2] == "draft":
+				createNewDraft(sys.argv[3])
+			else:
+				raise ParseException()
+		elif sys.argv[1] == "publish":
+			print("publish")
+		else:
+			raise ParseException()
+	except ParseException:
+		print(sys.argv)
+		showDraughtHelp()
 	
-	subparsers = parser.add_subparsers(help="something")
-	
-	# new command parser
-	parser_new = subparsers.add_parser("new", help="new help")
-	parser_new.add_argument("type", help="post or draft")
-	parser_new.add_argument("title", nargs=1)
-	
-	# publish command parser
-	parser_publish = subparsers.add_parser("publish", help="publish help")
-	parser_publish.add_argument("target", help="draft to publish")
-	
-	try:	
-		args = parser.parse_args()
-		print("parsing done")
-		print(str(args))
-	except:
-		print("do it properly yo")
-	
-
