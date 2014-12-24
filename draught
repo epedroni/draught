@@ -2,14 +2,13 @@
 
 '''
 TODO:
-	- sort out dates for new post
-	- replace everything but alphanumeric with '-' (slugify)
 	- 
 '''
 import os
 import sys
 import shutil
 import re
+import datetime
 
 class ParseException(Exception):
 	pass
@@ -24,15 +23,42 @@ def getWebsiteRoot():
 			os.chdir("..")
 			path = str(os.getcwd())
 	raise Exception()
+
+# Asks a y/n question, returns true if y, false if n
+def askYN(question):
+	print("[draught] " + question, end=" (Y/n) ")
+	answer = input().lower()
 	
-def ask(question):
-	print(question, end=" ")
-	return input()
+	if answer == "" or answer == "y" or answer == "yes":
+		return True
+	else:
+		return False
 
-def slugify(string):
-	newString = string.lower()
-	return re.sub("[^(a-z|0-9)]+", '-', newString)
+# Ensure that a directory exists, return false if it does not
+def ensureDir(path):
+	fullPath = os.path.join(siteRoot, path)
+	if not os.path.exists(fullPath):
+		if askYN(path + " has not been found, would you like to create it?"):
+			try:
+				os.mkdir(fullPath)
+				return True
+			except:
+				return False
+		else:
+			return False
+	else:
+		return True
 
+# Condition strings for URLs
+def slugify(string, date=False):
+	slug = string.lower()
+	slug = re.sub("[^(a-z0-9)]+", "-", slug).strip("-")
+	if date:
+		today = datetime.date.today()
+		slug = str(today.year) + "-" + str(today.month) + "-" + str(today.day) + "-" + slug
+	return slug
+	
+# Show top-level help info
 def showDraughtHelp():
 	print("usage: draught <command> [<args>]\n")
 	print("Available commands:")
@@ -40,33 +66,29 @@ def showDraughtHelp():
 	print("\tpublish\tmake drafts available\n")
 	print("See 'draught help <command>' for information about commands.")
 
-def createNewPost(title):
-	if not os.path.exists(os.path.join(siteRoot, "_posts")):
-		create = ask("_posts has not been found, would you like to create it? (Y/n)")
-		if create == "y" or create == "yes" or create == "":
-			os.mkdir(os.path.join(siteRoot, "_posts"))
+# Create a new post
+def createNewPost(title, extension="md"):
+	if ensureDir("_posts"):
+		fileName = slugify(title, date=True) + "." + extension
+		postPath = os.path.join(siteRoot, "_posts", fileName)
+		if not os.path.exists(postPath):
+			open(postPath, 'a').close()
 		else:
-			print("can't create a post if _posts doesn't exist, abort!")
-			return
-	postPath = os.path.join(siteRoot, "_posts", slugify(title) + ".md")
-	if not os.path.exists(postPath):
-		open(postPath, 'a').close()
+			print("[draught] Error: " + fileName + " already exists")
 	else:
-		print("post already exists, abort!")
-	
-def createNewDraft(title):
-	if not os.path.exists(os.path.join(siteRoot, "_drafts")):
-		create = ask("_drafts has not been found, would you like to create it? (Y/n)")
-		if create == "y" or create == "yes" or create == "":
-			os.mkdir(os.path.join(siteRoot, "_drafts"))
+		print("[draught] Error: _posts/ does not exist, or requires higher privileges")
+
+# Create a new draft
+def createNewDraft(title, extension="md"):
+	if ensureDir("_drafts"):
+		fileName = slugify(title) + "." + extension
+		draftPath = os.path.join(siteRoot, "_drafts", fileName)
+		if not os.path.exists(draftPath):
+			open(draftPath, 'a').close()
 		else:
-			print("can't create a draft if _drafts doesn't exist, abort!")
-			return
-	draftPath = os.path.join(siteRoot, "_drafts", slugify(title) + ".md")
-	if not os.path.exists(draftPath):
-		open(draftPath, 'a').close()
+			print("[draught] Error: " + fileName + " already exists")
 	else:
-		print("draft already exists, abort!")
+		print("[draught] Error: _drafts/ does not exist, or requires higher privileges")
 
 # The entry point
 if __name__ == "__main__":
@@ -90,6 +112,5 @@ if __name__ == "__main__":
 		else:
 			raise ParseException()
 	except ParseException:
-		print(sys.argv)
 		showDraughtHelp()
 	
