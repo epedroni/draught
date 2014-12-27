@@ -2,7 +2,9 @@
 
 '''
 TODO:
-	- 
+	- publish
+	- manage
+	- usage for individual commands
 '''
 import os
 import sys
@@ -38,7 +40,7 @@ def askYN(question):
 def ensureDir(path):
 	fullPath = os.path.join(siteRoot, path)
 	if not os.path.exists(fullPath):
-		if askYN(path + " has not been found, would you like to create it?"):
+		if askYN("Directory " + path + " has not been found, would you like to create it?"):
 			try:
 				os.mkdir(fullPath)
 				return True
@@ -74,7 +76,7 @@ def createNewPost(title, extension="md"):
 		if not os.path.exists(postPath):
 			open(postPath, 'a').close()
 		else:
-			print("[draught] Error: " + fileName + " already exists")
+			print("[draught] Error:", fileName, "already exists")
 	else:
 		print("[draught] Error: _posts/ does not exist, or requires higher privileges")
 
@@ -86,7 +88,7 @@ def createNewDraft(title, extension="md"):
 		if not os.path.exists(draftPath):
 			open(draftPath, 'a').close()
 		else:
-			print("[draught] Error: " + fileName + " already exists")
+			print("[draught] Error:", fileName, "already exists")
 	else:
 		print("[draught] Error: _drafts/ does not exist, or requires higher privileges")
 
@@ -106,11 +108,15 @@ if __name__ == "__main__":
 			elif sys.argv[2] == "draft":
 				createNewDraft(sys.argv[3])
 			else:
-				raise ParseException()
+				raise ParseException(sys.argv[2])
 		elif sys.argv[1] == "publish":
 			print("publish")
 		else:
-			raise ParseException()
-	except ParseException:
+			raise ParseException(sys.argv[1])
+	except ParseException as pe:
+		print("[draught] Error: unknown command:", pe.args[0])
+		showDraughtHelp()
+	except IndexError as ie:
+		print("[draught] Error: arguments missing")
 		showDraughtHelp()
 	
