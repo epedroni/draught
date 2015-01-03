@@ -2,19 +2,16 @@
 
 '''
 TODO:
-	- publish
-	- manage
+	- manage (groundwork is laid out)
+	- archetypes
 	- usage for individual commands
 '''
-import os
-import sys
-import shutil
-import re
-import datetime
+import os, sys, shutil, re, manager, docs
+from datetime import date
 
 class ParseException(Exception):
 	pass
-
+	
 # Recursively cd up until either _config.yml is found or we reach /
 def getWebsiteRoot():
 	path = str(os.getcwd())
@@ -51,27 +48,22 @@ def ensureDir(path):
 	else:
 		return True
 
+# Add the Jekyll date prefix in proper slugified format
+def addDatePrefix(string):
+	return date.isoformat(date.today()) + "-" + string
+
 # Condition strings for URLs
-def slugify(string, date=False):
+def slugify(string, addDate=False):
 	slug = string.lower()
 	slug = re.sub("[^(a-z0-9)]+", "-", slug).strip("-")
-	if date:
-		today = datetime.date.today()
-		slug = str(today.year) + "-" + str(today.month) + "-" + str(today.day) + "-" + slug
+	if addDate:
+		slug = addDatePrefix(slug)
 	return slug
-	
-# Show top-level help info
-def showDraughtHelp():
-	print("usage: draught <command> [<args>]\n")
-	print("Available commands:")
-	print("\tnew\tcreate new content")
-	print("\tpublish\tmake drafts available\n")
-	print("See 'draught help <command>' for information about commands.")
 
 # Create a new post
 def createNewPost(title, extension="md"):
 	if ensureDir("_posts"):
-		fileName = slugify(title, date=True) + "." + extension
+		fileName = slugify(title, addDate=True) + "." + extension
 		postPath = os.path.join(siteRoot, "_posts", fileName)
 		if not os.path.exists(postPath):
 			open(postPath, 'a').close()
@@ -92,31 +84,66 @@ def createNewDraft(title, extension="md"):
 	else:
 		print("[draught] Error: _drafts/ does not exist, or requires higher privileges")
 
+def publishContent():
+	try:
+		drafts = manager.Manager(os.path.join(siteRoot, "_drafts")).getContents()
+		if len(drafts) > 0:
+			print("[draught] These are your drafts:")
+			for index, item in enumerate(drafts):
+				print("\t", index, ":", item[0])
+			print("[draught] What would you like to publish? ", end="")
+			publish = input()
+			if re.search("[^0-9]", publish) == None:
+				publish = int(publish)
+				if publish < len(drafts):
+					oldName = drafts[publish][0]
+					oldPath = os.path.join(drafts[publish][1], oldName)
+					newName = addDatePrefix(drafts[publish][0])
+					newPath = os.path.join(siteRoot, "_posts", newName)
+					shutil.move(oldPath, newPath)
+					print("[draught] Published _drafts/" + oldName + " to _posts/" + newName)
+				else:
+					raise Exception(str(publish) + " does not correspond to a draft")
+			else:
+				raise Exception("please input a number relative to a draft")
+		else:
+			print("[draught] You have no drafts to publish")
+	except Exception as e:
+		print("[draught] Error:", str(e))
+
 # The entry point
 if __name__ == "__main__":
-
 	# first off, check if cwd is in a jekyll directory
 	try:
 		siteRoot = getWebsiteRoot()
 	except:
 		print("[draught] Error: this is not a Jekyll website")
 		sys.exit()
+	
+	# now parse arguments
+	command = ""
 	try:
-		if sys.argv[1] == "new":
+		command = sys.argv[1]
+		if command == "new":
 			if sys.argv[2] == "post":
 				createNewPost(sys.argv[3])
 			elif sys.argv[2] == "draft":
 				createNewDraft(sys.argv[3])
 			else:
 				raise ParseException(sys.argv[2])
-		elif sys.argv[1] == "publish":
-			print("publish")
+		elif command == "publish":
+			publishContent()
+		elif command == "help":
+			if len(sys.argv) > 2:
+				docs.showHelp(sys.argv[2]);
+			else:
+				docs.showHelp("help")
 		else:
 			raise ParseException(sys.argv[1])
 	except ParseException as pe:
-		print("[draught] Error: unknown command:", pe.args[0])
-		showDraughtHelp()
-	except IndexError as ie:
+		print("[draught] Error: unknown command \'" + pe.args[0] + "\'")
+		docs.showHelp(command)
+	except IndexError:
 		print("[draught] Error: arguments missing")
-		showDraughtHelp()
+		docs.showHelp(command)
 	
