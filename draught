@@ -3,15 +3,24 @@
 '''
 TODO:
 	- manage (groundwork is laid out)
+	- sitemap generator
 	- archetypes
 	- usage for individual commands
 '''
-import os, sys, shutil, re, manager, docs
+import os, sys, shutil, re, manager, yaml
 from datetime import date
 
 class ParseException(Exception):
 	pass
-	
+
+# Load help file and print help for the given command, if available
+def showHelp(command):
+	help = yaml.load(open(os.path.join(sys.path[0], "docs.yml"), 'r'))
+	try:
+		print(help[command])
+	except:
+		print(help["default"])
+
 # Recursively cd up until either _config.yml is found or we reach /
 def getWebsiteRoot():
 	path = str(os.getcwd())
@@ -135,15 +144,15 @@ if __name__ == "__main__":
 			publishContent()
 		elif command == "help":
 			if len(sys.argv) > 2:
-				docs.showHelp(sys.argv[2]);
+				showHelp(sys.argv[2]);
 			else:
-				docs.showHelp("help")
+				showHelp("help")
 		else:
 			raise ParseException(sys.argv[1])
 	except ParseException as pe:
 		print("[draught] Error: unknown command \'" + pe.args[0] + "\'")
-		docs.showHelp(command)
+		showHelp(command)
 	except IndexError:
 		print("[draught] Error: arguments missing")
-		docs.showHelp(command)
+		showHelp(command)
 	
