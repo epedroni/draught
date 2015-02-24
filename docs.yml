@@ -1,4 +1,4 @@
-"new" : "usage: draught new <type> <title>\n\nAvailable types:\n\tpost\tcreate a new post in _posts, ready for publishing\n\tdraft\tcreate a new draft in _drafts\n\t<title> is the literal title of the content, not the name of the file"
+"new" : "usage: draught new <type> <title>\n\nDefault types:\n\tpost\tcreate a new post in _posts, ready for publishing\n\tdraft\tcreate a new draft in _drafts\n\t<title> is the literal title of the content, not the name of the file"
 
 "publish" : "usage: draught publish\n\nDisplays an indexed list of drafts, type in the index of desired draft and press return to publish it.\nThis moves it to the _posts directory and adds today's date as the prefix."
 
