@@ -6,7 +6,7 @@ TODO:
         - sitemap generator
         - archetypes
 '''
-import os, sys, shutil, re, manager, yaml
+import io, os, sys, shutil, re, pkg_resources, yaml, manager
 from datetime import date
 
 class DraughtException(Exception):
@@ -16,7 +16,7 @@ class DraughtException(Exception):
 
 # Load help file and print help for the given command, if available
 def showHelp(command):
-        help = yaml.load(open(os.path.join(sys.path[0], "docs.yml"), 'r'))
+        help = yaml.load(pkg_resources.resource_string(__name__, 'resources/docs.yml'))
         try:
                 print(help[command])
         except:
