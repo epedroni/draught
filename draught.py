@@ -3,9 +3,7 @@
 '''
 TODO:
         - manage (groundwork is laid out)
-        - sitemap generator
         - archetypes
-        - sort out exceptions
 '''
 import io, os, sys, shutil, re, pkg_resources, yaml, manager
 from datetime import date
@@ -116,9 +114,7 @@ def publishContent():
                 rawInput = input().strip()
                 # check that input consists of integers and spaces only
                 if re.search("[^0-9 ]", rawInput) == None:
-                        
                         selectedDrafts = set(re.split(" +", rawInput))
-                        
                         for draft in selectedDrafts:
                                 index = int(draft)
                                 if index < len(draftsList):

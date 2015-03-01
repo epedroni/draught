@@ -12,7 +12,7 @@ class Manager(object):
 				for filename in filenames:
 					self.fileList.append([filename, root])
 		else:
-			raise Exception(path + " is not a valid path")
+			raise Exception(path + " is invalid")
 	
 	def getContents(self):
 		return self.fileList
