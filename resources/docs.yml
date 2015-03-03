@@ -1,5 +1,27 @@
-"new" : "usage: draught new <type> <title>\n\nDefault types:\n\tpost\tcreate a new post in _posts, ready for publishing\n\tdraft\tcreate a new draft in _drafts\n\t<title> is the literal title of the content, not the name of the file"
+"default" : |
+    usage: draught <command> [<args>]
+    
+    Available commands:
+        new         create new content
+        publish     convert drafts into posts
+    
+    See 'draught help <command>' for information about commands.
+    For a more detailed guide, go to https://github.com/epedroni/draught.
 
-"publish" : "usage: draught publish\n\nDisplays an indexed list of drafts, enter the index of desired draft and press return to publish it.\nThis moves it to the _posts directory and adds today's date as the prefix."
+"new" : |
+    usage: draught new <type> <title>
+    
+    Default types:
+        post    create a new post in _posts, ready for publishing
+        draft   create a new draft in _drafts
+        
+    New content can be created for collections as well, by using the collection name exactly as it is declared in _config.yml
+        
+    <title> is the literal title of the content used in the front matter
 
-"default" : "usage: draught <command> [<args>]\n\nAvailable commands:\n\tnew\tcreate new content\n\tpublish\tmake drafts available\n\nSee 'draught help <command>' for information about commands."
+"publish" : |
+    usage: draught publish
+    
+    Displays an indexed list of drafts. Enter the index of one or more drafts and press return to publish them.
+    This moves them to the _posts directory and adds today's date as the prefix.
+

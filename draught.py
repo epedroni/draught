@@ -2,8 +2,6 @@
 
 '''
 TODO:
-    - manage (groundwork is laid out)
-    - archetypes
     - rss
 '''
 import io
@@ -39,7 +37,7 @@ def error(message, exit=True):
 
 # Load help file and print help for the given command, if available
 def showHelp(command):
-    help = yaml.load(pkg_resources.resource_string(__name__, 'resources/docs.yml'))
+    help = yaml.load(pkg_resources.resource_string(__name__, "resources/docs.yml"))
     try:
         print(help[command])
     except:
@@ -85,27 +83,44 @@ def slugify(string, addDate=False):
 # Determine content type and create it
 def createNewContent(collection, title, extension="md"):
     # first check if the given collection is explicitly defined in _config.yml
-    collections = yaml.load(open(os.path.join(siteRoot, "_config.yml")))["collections"]
+    collections = yaml.load(open(os.path.join(siteRoot, "_config.yml"), "r"))["collections"]
     
     if collection in collections:
-        makeNewFile("_" + collection, slugify(title) + "." + extension)
+        newFile = makeNewFile("_" + collection, slugify(title) + "." + extension)
+        insertFrontMatter(newFile, collection)
     elif collection == "post" or collection == "posts":
-        makeNewFile("_posts", slugify(title, addDate=True) + "." + extension)
+        newFile = makeNewFile("_posts", slugify(title, addDate=True) + "." + extension)
+        insertFrontMatter(newFile, "posts", contentTitle=title)
     elif collection == "draft" or collection == "drafts":
-        makeNewFile("_drafts", slugify(title) + "." + extension)
+        newFile = makeNewFile("_drafts", slugify(title) + "." + extension)
+        insertFrontMatter(newFile, "drafts", contentTitle=title)
     else:
         error(collection + " is not a valid collection, declared collections are: " + ', '.join([k for k in collections.keys()]))
     
-# Create a new file, path is relative to website root
+# Create and returns path to a new file, path argument is relative to website root
 def makeNewFile(relativePath, name):
     if ensureDir(relativePath):
         filePath = os.path.join(siteRoot, relativePath, name)
         if not os.path.exists(filePath):
-            open(filePath, 'a').close()
+            open(filePath, "w").close()
+            return os.path.join(relativePath, name)
         else:
             error(os.path.join(relativePath, name) + " already exists")
     else:
         error(relativePath + " does not exist, or requires higher permissions")
+
+# Insert front matter into a file
+def insertFrontMatter(filePath, contentType, contentTitle="\"Enter title\""):
+    newFile = open(os.path.join(siteRoot, filePath), "w")
+    try:
+        with open(os.path.join(siteRoot, ".templates", contentType)) as templateFile:
+            template = templateFile.read()
+    except:
+        template = pkg_resources.resource_string(__name__, "resources/template.yml").decode("utf-8")
+    
+    frontMatter = template.format(title=contentTitle)
+    newFile.write(frontMatter)
+    newFile.close()
 
 # Print an indexed list of drafts and prompt user for draft(s) to publish
 def publishContent():
