@@ -34,6 +34,38 @@ creates ~/my_blog/_projects/foobar.md.
 
 ### Front Matter
 
-When creating content, Draught will attempt to insert specific front matter for each content type. Draught looks for templates as plain-text files in .templates, under the website root. 
+When creating content, Draught will attempt to insert front matter for each content type. For each content type, Draught looks for a plain text file under .templates with an identical name. For example, the contents of ~/my_blog/.templates/posts are automatically added to any posts created with `draught new post`. Templates also work for collections, as long as they are appropriately named. If a template is not defined, the following default is used:
 
+```
+---
+title: "Enter title"
+---
+```
 
+When writing templates, `{title}` can be used as a placeholder for the content title. So running
+
+```
+~/my_blog $ draught new post "Five Foos in a Bar"
+```
+
+with a template such as ~/my_blog/.templates/posts containing
+
+```
+---
+title: {title}
+layout: post
+---
+```
+
+will create the file ~/my_blog/_posts/YYYY-MM-DD-five-foos-in-a-bar.md with the following front matter:
+
+```
+---
+title: "Five Foos in a Bar"
+layout: post
+---
+```
+
+### Publishing Drafts
+
+Existing drafts can be turned into posts by running `draught publish`, which shows a numbered list of all available drafts. One or more drafts can be addressed by index, causing them to be copied to _posts with the current date. 
