@@ -8,6 +8,8 @@ Current features:
 * Publish drafts;
 * Template front matter for posts, drafts and collections.
 
+For a built executable, look under [build](https://github.com/epedroni/draught/tree/master/build).
+
 ## Usage
 
 ### Creating Content
