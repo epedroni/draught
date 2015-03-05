@@ -83,11 +83,17 @@ def slugify(string, addDate=False):
 # Determine content type and create it
 def createNewContent(collection, title, extension="md"):
     # first check if the given collection is explicitly defined in _config.yml
-    collections = yaml.load(open(os.path.join(siteRoot, "_config.yml"), "r"))["collections"]
+    config = open(os.path.join(siteRoot, "_config.yml"), "r")
+    try:
+        collections = yaml.load(config)["collections"]
+    except:
+        collections = list()
+    finally:
+        config.close()
     
     if collection in collections:
         newFile = makeNewFile("_" + collection, slugify(title) + "." + extension)
-        insertFrontMatter(newFile, collection)
+        insertFrontMatter(newFile, collection, contentTitle=title)
     elif collection == "post" or collection == "posts":
         newFile = makeNewFile("_posts", slugify(title, addDate=True) + "." + extension)
         insertFrontMatter(newFile, "posts", contentTitle=title)
@@ -143,23 +149,27 @@ def publishDraft(draft):
         shutil.move(oldPath, newPath)
         info("Published _drafts/" + oldName + " to _posts/" + newName)
 
-# Sort through sys.argv, print error messages if anything bad happens
-def parseArguments():
-    command = ""
+# Sort through arguments, print error messages if anything bad happens
+def main(args):
+    # first off, check if cwd is a jekyll (sub-)directory
+    global siteRoot
+    siteRoot = getWebsiteRoot()
+     
+    command = "default"
     try:
         # now parse arguments
-        command = sys.argv[1]
+        command = args[1]
         if command == "new" or command == "n":
-            createNewContent(sys.argv[2], sys.argv[3])
+            createNewContent(args[2], args[3])
         elif command == "publish" or command == "p":
             publishContent()
         elif command == "help" or command == "h":
-            if len(sys.argv) > 2:
-                showHelp(sys.argv[2]);
+            if len(args) > 2:
+                showHelp(args[2]);
             else:
                 showHelp("help")
         else:
-            info("unknown command: \'" + sys.argv[1] + "\'")
+            info("unknown command: \'" + args[1] + "\'")
             showHelp("default")
     except IndexError:
         error("arguments missing", exit=False)
@@ -167,7 +177,5 @@ def parseArguments():
 
 # The entry point
 if __name__ == "__main__":
-    # first off, check if cwd is a jekyll (sub-)directory
-    siteRoot = getWebsiteRoot()
-    parseArguments()
+    main(sys.argv)
         

@@ -15,9 +15,9 @@
         post    create a new post in _posts, ready for publishing
         draft   create a new draft in _drafts
         
-    New content can be created for collections as well, by using the collection name exactly as it is declared in _config.yml
+    New content can be created for collections as well, by using the collection name exactly as it is declared in _config.yml.
         
-    <title> is the literal title of the content used in the front matter
+    <title> is the literal title of the content used in the front matter.
 
 "publish" : |
     usage: draught publish
@@ -25,3 +25,7 @@
     Displays an indexed list of drafts. Enter the index of one or more drafts and press return to publish them.
     This moves them to the _posts directory and adds today's date as the prefix.
 
+"help" : |
+    usage: draught help <command>
+    
+    Displays help specific to the given command.
