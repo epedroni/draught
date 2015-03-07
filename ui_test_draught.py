@@ -6,7 +6,21 @@ import os
 import shutil
 from datetime import date
 
-class contentCreationTests(unittest.TestCase):
+# So-called UI tests, as these test Draught's "entry point".
+# Draught is such a small project that the distinction between
+# UI, integration and unit tests falls apart, but as an exercise
+# in testing, UI tests have been written.
+# The test site is created once and cleaned before each test, to
+# minimise the number of filesystem operations.
+
+# Superclass with factored-out setup
+class DraughtTests(unittest.TestCase):
+
+    def setUp(self):
+        cleanDirectories()
+
+# Happy-path content creation using the interface
+class ContentCreationTests(DraughtTests):
 
     def test_createNewPost(self):
         draught.main(("draught", "new", "post", "Post Name"))
@@ -23,7 +37,8 @@ class contentCreationTests(unittest.TestCase):
         expectedFileName = "content-name.md"
         self.assertTrue(os.path.exists(os.path.join("_coll", expectedFileName)))
 
-class templateTests(unittest.TestCase):
+# Happy-path content creation with templates using the interface
+class ContentCreationWithTemplateTests(DraughtTests):
 
     def test_defaultTemplatePost(self):
         draught.main(("draught", "new", "post", "Template Test Post"))
@@ -31,7 +46,7 @@ class templateTests(unittest.TestCase):
         with open(os.path.join("_posts", postFile)) as post:
             actualPostContent = post.read()
         with open("../resources/template.yml") as default:
-            expectedPostContent = default.read().format(title="Template Test Post") 
+            expectedPostContent = default.read().format(title="\"Template Test Post\"") 
         self.assertTrue(actualPostContent == expectedPostContent)
         
     def test_defaultTemplateDraft(self):
@@ -40,7 +55,7 @@ class templateTests(unittest.TestCase):
         with open(os.path.join("_drafts", draftFile)) as draft:
             actualDraftContent = draft.read()
         with open("../resources/template.yml") as default:
-            expectedDraftContent = default.read().format(title="Template Test Draft") 
+            expectedDraftContent = default.read().format(title="\"Template Test Draft\"") 
         self.assertTrue(actualDraftContent == expectedDraftContent)
     
     def test_defaultTemplateColl(self):
@@ -49,7 +64,7 @@ class templateTests(unittest.TestCase):
         with open(os.path.join("_coll", collFile)) as coll:
             actualCollContent = coll.read()
         with open("../resources/template.yml") as default:
-            expectedCollContent = default.read().format(title="Template Test Coll")        
+            expectedCollContent = default.read().format(title="\"Template Test Coll\"")        
         self.assertTrue(actualCollContent == expectedCollContent)
 
     def test_customTemplatePost(self):
@@ -66,9 +81,8 @@ class templateTests(unittest.TestCase):
         postFile = date.isoformat(date.today()) + "-custom-template-test-post.md"
         with open(os.path.join("_posts", postFile)) as post:
             actualPostContent = post.read()
-        expectedPostContent = template.format(title="Custom Template Test Post") 
+        expectedPostContent = template.format(title="\"Custom Template Test Post\"") 
         self.assertTrue(actualPostContent == expectedPostContent)
-        os.remove(".templates/posts")
         
     def test_customTemplateDraft(self):
         template = """
@@ -84,9 +98,8 @@ class templateTests(unittest.TestCase):
         draftFile = "custom-template-test-draft.md"
         with open(os.path.join("_drafts", draftFile)) as draft:
             actualDraftContent = draft.read()
-        expectedDraftContent = template.format(title="Custom Template Test Draft") 
+        expectedDraftContent = template.format(title="\"Custom Template Test Draft\"") 
         self.assertTrue(actualDraftContent == expectedDraftContent)
-        os.remove(".templates/drafts")
         
     def test_customTemplateColl(self):
         template = """
@@ -102,10 +115,10 @@ class templateTests(unittest.TestCase):
         collFile = "custom-template-test-coll.md"
         with open(os.path.join("_coll", collFile)) as coll:
             actualCollContent = coll.read()
-        expectedCollContent = template.format(title="Custom Template Test Coll") 
+        expectedCollContent = template.format(title="\"Custom Template Test Coll\"") 
         self.assertTrue(actualCollContent == expectedCollContent)
-        os.remove(".templates/coll")
-
+        
+# Supporting functions
 def createTestWebsite():
     os.mkdir("test_site")
     os.chdir("test_site")
@@ -130,7 +143,16 @@ def createTestWebsite():
     os.mkdir("_drafts")
     os.mkdir("_coll")
     os.mkdir(".templates")
-        
+
+def cleanDirectories():
+    directories = ("_posts", "_drafts", "_coll", ".templates")
+    for directory in directories:
+        for fileName in os.listdir(directory):
+            filePath = os.path.join(directory, fileName)
+            try:
+                os.remove(filePath)
+            except Exception as e:
+                print(e)
 
 def cleanUp():
     os.chdir("..")

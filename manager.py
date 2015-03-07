@@ -13,9 +13,8 @@ def prompt(directory):
                 print("\t", index, ":", filename)
                 index += 1
         print("\t q : quit")
-        print("Choose one or more files: ", end="")
         
-        rawInput = input().strip()
+        rawInput = input("Choose one or more files: ").strip()
         # check that input consists of integers and spaces only
         if re.search("[^0-9 ]", rawInput) == None:
             selectedFiles = set(re.split(" +", rawInput))

@@ -3,7 +3,7 @@
 # Try to zip up the required draught files into a package, then make it executable.
 
 # Check if build exists, if not create it
-mkdir build
+mkdir -p build
 
 echo 'Copying draught.py...'
 cp draught.py __main__.py

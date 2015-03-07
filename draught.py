@@ -45,8 +45,7 @@ def showHelp(command):
 
 # Asks a y/n question, returns true if y, false if n
 def askYN(question):
-    print("[draught] " + question, end=" (Y/n) ")
-    answer = input().lower()
+    answer = input("[draught] " + question + " (Y/n) ").lower()
     
     if answer == "" or answer == "y" or answer == "yes":
         return True
@@ -124,7 +123,7 @@ def insertFrontMatter(filePath, contentType, contentTitle="\"Enter title\""):
     except:
         template = pkg_resources.resource_string(__name__, "resources/template.yml").decode("utf-8")
     
-    frontMatter = template.format(title=contentTitle)
+    frontMatter = template.format(title="\"" + contentTitle + "\"")
     newFile.write(frontMatter)
     newFile.close()
 
