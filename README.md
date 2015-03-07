@@ -1,5 +1,7 @@
 # Draught
 
+[![Build Status](https://travis-ci.org/epedroni/draught.svg?branch=dev)](https://travis-ci.org/epedroni/draught)
+
 A Python tool for creating and managing content for Jekyll websites.
 
 Current features:
