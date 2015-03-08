@@ -118,6 +118,70 @@ class ContentCreationWithTemplateTests(DraughtTests):
         expectedCollContent = template.format(title="\"Custom Template Test Coll\"") 
         self.assertTrue(actualCollContent == expectedCollContent)
         
+# Irregular cases
+class InvalidContentCreation(DraughtTests):
+
+    def test_exitIfPostExists(self):
+        draught.main(("draught", "new", "post", "Post Name"))
+        
+        with self.assertRaises(SystemExit):
+            draught.main(("draught", "new", "post", "Post Name"))
+            
+    def test_exitIfDraftExists(self):
+        draught.main(("draught", "new", "draft", "Draft Name"))
+        
+        with self.assertRaises(SystemExit):
+            draught.main(("draught", "new", "draft", "Draft Name"))
+            
+    def test_exitIfCollExists(self):
+        draught.main(("draught", "new", "coll", "Coll Name"))
+        
+        with self.assertRaises(SystemExit):
+            draught.main(("draught", "new", "coll", "Coll Name"))
+            
+    def test_existingPostNotOverwritten(self):
+        draught.main(("draught", "new", "post", "Post Name"))
+        fileName = date.isoformat(date.today()) + "-post-name.md"
+        with open(os.path.join("_posts", fileName), "a") as post:
+            post.write("This content should still be there")
+        
+        try:
+            draught.main(("draught", "new", "post", "Post Name"))
+        except:
+            pass
+        
+        with open(os.path.join("_posts", fileName)) as post:
+            self.assertTrue(post.read().find("This content should still be there"))
+            
+    def test_existingDraftNotOverwritten(self):
+        draught.main(("draught", "new", "draft", "Draft Name"))
+        fileName = "draft-name.md"
+        with open(os.path.join("_drafts", fileName), "a") as draft:
+            draft.write("This content should still be there")
+        
+        try:
+            draught.main(("draught", "new", "draft", "Draft Name"))
+        except:
+            pass
+        
+        with open(os.path.join("_drafts", fileName)) as draft:
+            self.assertTrue(draft.read().find("This content should still be there"))
+    
+    def test_existingCollNotOverwritten(self):
+        draught.main(("draught", "new", "coll", "Coll Name"))
+        fileName = "coll-name.md"
+        with open(os.path.join("_coll", fileName), "a") as coll:
+            coll.write("This content should still be there")
+        
+        try:
+            draught.main(("draught", "new", "coll", "Coll Name"))
+        except:
+            pass
+        
+        with open(os.path.join("_coll", fileName)) as coll:
+            self.assertTrue(coll.read().find("This content should still be there"))
+            
+
 # Supporting functions
 def createTestWebsite():
     os.mkdir("test_site")

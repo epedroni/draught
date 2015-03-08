@@ -33,7 +33,7 @@ def info(message):
 def error(message, exit=True):
     print("[draught] Error:", message)
     if exit:
-        sys.exit(1)
+        sys.exit()
 
 # Load help file and print help for the given command, if available
 def showHelp(command):
